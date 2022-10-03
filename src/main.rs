@@ -198,7 +198,7 @@ fn main() {
     if args.len() == 1 {
         loop {
             let number = input_upper("(`!exit` to exit) Which number to convert? >");
-            if number == "!exit".to_string() {
+            if number == "!EXIT".to_string() {
                 break;
             } else {
                 let from = input_u8("The number is expressed in ");
@@ -252,11 +252,7 @@ fn input_upper(console: &str) -> String {
     if input == "".to_string() {
         panic!("Function `input_upper` failed. (Exit code: 0b11101100b11000010b11100100b11010010b11000010b11000100b11011000b11001010b1000000b11000000b11010010b11011100b11100000b11101010b11101000b11000000b1000000b11010010b11100110b1000000b11000100b11011000b11000010b11011100b11010110b100001)")
     } else {
-        input
-            .trim()
-            .to_uppercase()
-            .parse()
-            .expect("Function `input_upper` failed. (Exit code: 0b10100110b10110010b10100110b10101000b10001010b10011010b1000000b10001010b10100100b10100100b10011110b10100100b1110100b1000000b11010010b11011100b11100000b11101010b11101000b10111110b11101010b11100000b11100000b11001010b11100100b1110100b1110100b11001010b11110000b11100000b11001010b11000110b11101000b110010)")
+        input.trim().to_uppercase()
     }
 }
 fn input_u8(console: &str) -> u8 {
