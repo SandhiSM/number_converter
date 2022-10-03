@@ -74,7 +74,7 @@ impl Information {
     fn number_check(&mut self) {
         let mut number = alphabet2number(&self.number);
         if let Some(point) = number.iter().position(|x| *x == 36) {
-            self.float = false;
+            self.float = true;
             number.remove(point);
         }
         for num in number {
@@ -85,13 +85,17 @@ impl Information {
     }
     fn range_check(&self) {
         if self.float {
-            if self
-                .number
-                .parse::<u128>()
-                .expect("Function `range_check` failed. (Exit code: 0b10100110b10110010b10100110b10101000b10001010b10011010b1000000b10001010b10100100b10100100b10011110b10100100b1110100b1000000b11100100b11000010b11011100b11001110b11001010b10111110b11000110b11010000b11001010b11000110b11010110b1110100b1110100b11001010b11110000b11100000b11001010b11000110b11101000b110001)")
-                >= f64::MAX as u128
-            {
-                panic!("Function `range_check` failed. (Exit code: 0b10101010b10100110b10001010b10100100b1000000b10001010b10100100b10100100b10011110b10100100b1110100b1000000b11101100b11000010b11100100b11010010b11000010b11000100b11011000b11001010b1000000b11000000b11011100b11101010b11011010b11000100b11001010b11100100b11000000b1010000b11001100b11011000b11011110b11000010b11101000b1010010b1000000b11001010b11110000b11000110b11001010b11001010b11001000b11100110b1000000b11101000b11010000b11001010b1000000b11100100b11000010b11011100b11001110b11001010b1000000b11101110b11010000b11010010b11000110b11010000b1000000b11010010b11100110b1000000b11000010b11000100b11011000b11001010b1000000b11101000b11011110b1000000b11000110b11011110b11011100b11101100b11001010b11100100b11101000b100001)");
+            if let Some(point) = alphabet2number(&self.number).iter().position(|x| *x == 36) {
+                let number = &self.number[..point];
+                if number
+                    .parse::<u128>()
+                    .expect("Function `range_check` failed. (Exit code: 0b10100110b10110010b10100110b10101000b10001010b10011010b1000000b10001010b10100100b10100100b10011110b10100100b1110100b1000000b11100100b11000010b11011100b11001110b11001010b10111110b11000110b11010000b11001010b11000110b11010110b1110100b1110100b11001010b11110000b11100000b11001010b11000110b11101000b110001)")
+                    >= f64::MAX as u128
+                {
+                    panic!("Function `range_check` failed. (Exit code: 0b10101010b10100110b10001010b10100100b1000000b10001010b10100100b10100100b10011110b10100100b1110100b1000000b11101100b11000010b11100100b11010010b11000010b11000100b11011000b11001010b1000000b11000000b11011100b11101010b11011010b11000100b11001010b11100100b11000000b1010000b11001100b11011000b11011110b11000010b11101000b1010010b1000000b11001010b11110000b11000110b11001010b11001010b11001000b11100110b1000000b11101000b11010000b11001010b1000000b11100100b11000010b11011100b11001110b11001010b1000000b11101110b11010000b11010010b11000110b11010000b1000000b11010010b11100110b1000000b11000010b11000100b11011000b11001010b1000000b11101000b11011110b1000000b11000110b11011110b11011100b11101100b11001010b11100100b11101000b100001)");
+                }
+            } else {
+                panic!("Function `range_check` failed. (Exit code: 0b10100110b10110010b10100110b10101000b10001010b10011010b1000000b10001010b10100100b10100100b10011110b10100100b1110100b1000000b11100100b11000010b11011100b11001110b11001010b10111110b11000110b11010000b11001010b11000110b11010110b1110100b1110100b11001000b11001010b11000110b11010010b11011010b11000010b11011000b1000000b11100000b11011110b11010010b11011100b1110100)");
             }
         } else {
             if self
@@ -119,16 +123,18 @@ impl Information {
     }
     fn float_convert_to_decimal(&mut self) {
         let mut number = alphabet2number(&self.number);
+        #[allow(unused_assignments)]
+        let mut count = 0i32;
         if let Some(point) = number.iter().position(|x| *x == 36) {
-            number = number[..point].to_vec();
+            number.remove(point);
+            count = number[..point].len() as i32;
         } else {
             panic!("Function `float_convert_to_decimal` failed. (Exit code: 0b10100110b10110010b10100110b10101000b10001010b10011010b1000000b10001010b10100100b10100100b10011110b10100100b1110100b1000000b11001100b11011000b11011110b11000010b11101000b10111110b11000110b11011110b11011100b11101100b11001010b11100100b11101000b10111110b11101000b11011110b10111110b11001000b11001010b11000110b11010010b11011010b11000010b11011000b1110100b1110100b11001100b11000010b11010010b11011000b11001010b11001000b1000000b11101000b11011110b1000000b11001100b11010010b11011100b11001000b1000000b11001000b11001010b11000110b11010010b11011010b11000010b11011000b1000000b11100000b11011110b11010010b11011100b1110100)");
         }
-        let mut count = number.len() as u32;
-        let mut old = 0;
-        let mut new = 0;
+        let mut old = 0.0;
+        let mut new = 0.0;
         for num in number {
-            let converted = (self.from.pow(count - 1) * num) as u128;
+            let converted = (self.from as f64).powi(count - 1) * num as f64;
             new = converted + old;
             old = new;
             count -= 1;
@@ -143,7 +149,7 @@ impl Information {
             .expect("Function `integer_calculate` failed. (Exit code: 0b10100110b10110010b10100110b10101000b10001010b10011010b1000000b10001010b10100100b10100100b10011110b10100100b1110100b1000000b11010010b11011100b11101000b11001010b11001110b11001010b11100100b10111110b11000110b11000010b11011000b11000110b11101010b11011000b11000010b11101000b11001010b1110100b1110100b11001010b11110000b11100000b11001010b11000110b1110100)");
         while number >= self.to as u128 {
             let division = number / self.to as u128;
-            let modu = number & self.to as u128;
+            let modu = number % self.to as u128;
             if modu >= 10 {
                 output.insert(0, number2alphabet(modu));
             } else {
@@ -161,7 +167,7 @@ impl Information {
         }
         output
     }
-    fn float_calculate(&self) -> Vec<String> {
+    fn float_calculate(&mut self) -> Vec<String> {
         let mut output = vec!["0".to_string(), ".".to_string()];
         let number = self
             .number
@@ -170,6 +176,7 @@ impl Information {
         let integer = number.floor();
         let mut decimal_point = number - integer;
         if integer >= 1.0 {
+            self.number = (integer as u128).to_string();
             let integral = convert_vec_to_string(self.integer_calculate());
             output.remove(0);
             output.insert(0, integral);
@@ -181,9 +188,6 @@ impl Information {
         }
         if output[output.len() - 1] == ".".to_string() {
             output.remove(output.len() - 1);
-        }
-        if self.minus {
-            output.insert(0, "-".to_string());
         }
         output
     }
@@ -305,17 +309,31 @@ fn alphabet2number(number: &str) -> Vec<u8> {
     converted_number
 }
 fn number2alphabet(number: u128) -> String {
-    let mut string = String::new();
-    for alphabet in CONVERT_TABLE {
-        if alphabet[1] == number.to_string().as_str() {
-            string = alphabet[0].to_string();
-            break;
-        }
-    }
-    if string == "".to_string() {
-        panic!("Function `number2alphabet` failed. (Exit code: 0b10100110b10110010b10100110b10101000b10001010b10011010b1000000b10001010b10100100b10100100b10011110b10100100b1110100b1000000b11011100b11101010b11011010b11000100b11001010b11100100b1100100b11000010b11011000b11100000b11010000b11000010b11000100b11001010b11101000b1110100b1110100b11001010b11110000b11100000b11001010b11000110b1110100)");
+    if number == 0
+        || number == 1
+        || number == 2
+        || number == 3
+        || number == 4
+        || number == 5
+        || number == 6
+        || number == 7
+        || number == 8
+        || number == 9
+    {
+        return number.to_string();
     } else {
-        return string;
+        let mut string = String::new();
+        for alphabet in CONVERT_TABLE {
+            if alphabet[1] == number.to_string().as_str() {
+                string = alphabet[0].to_string();
+                break;
+            }
+        }
+        if string == "".to_string() {
+            panic!("Function `number2alphabet` failed. (Exit code: 0b10100110b10110010b10100110b10101000b10001010b10011010b1000000b10001010b10100100b10100100b10011110b10100100b1110100b1000000b11011100b11101010b11011010b11000100b11001010b11100100b1100100b11000010b11011000b11100000b11010000b11000010b11000100b11001010b11101000b1110100b1110100b11001010b11110000b11100000b11001010b11000110b1110100)");
+        } else {
+            return string;
+        }
     }
 }
 fn convert_vec_to_string(vector: Vec<String>) -> String {
@@ -326,19 +344,22 @@ fn convert_vec_to_string(vector: Vec<String>) -> String {
     output
 }
 fn decode(errorcode: &str) -> String {
-    if errorcode.starts_with("Ob") {
+    if errorcode.starts_with("0b") {
         let mut release = Vec::<String>::new();
         let mut raw = errorcode.split("0b").collect::<Vec<&str>>();
         raw.remove(0);
         for binary in raw {
+            let mut instance = Information::new(binary, false, false, 2, 10);
+            instance.integer_convert_to_decimal();
+            let decimal = convert_vec_to_string(instance.integer_calculate());
             release.push(
                 std::char::from_u32(
-                    binary
+                    decimal
                         .parse()
                         .expect("Function `decode` failed. (Exit code: 0b10100110b10110010b10100110b10101000b10001010b10011010b1000000b10001010b10100100b10100100b10011110b10100100b1110100b1000000b11001000b11001010b11000110b11011110b11001000b11001010b1110100b1110100b11001010b11110000b11100000b11001010b11000110b11101000b110001)"),
                 )
                 .expect("Function `decode` failed. (Exit code: 0b10100110b10110010b10100110b10101000b10001010b10011010b1000000b10001010b10100100b10100100b10011110b10100100b1110100b1000000b11001000b11001010b11000110b11011110b11001000b11001010b1110100b1110100b11001010b11110000b11100000b11001010b11000110b11101000b110010)")
-                .to_string(),
+                .to_string()
             );
         }
         convert_vec_to_string(release)
