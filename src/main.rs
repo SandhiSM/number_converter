@@ -158,7 +158,11 @@ impl Information {
         }
         while decimal_point != 0.0 {
             let decimal = decimal_point * self.to as f64;
-            output.push((decimal as u64).to_string());
+            if decimal as u128 >= 10 {
+                output.push(number2alphabet(decimal as u128));
+            } else {
+                output.push((decimal as u128).to_string());
+            }
             decimal_point = decimal - decimal.floor();
         }
         if output[output.len() - 1] == ".".to_string() {
@@ -180,17 +184,29 @@ fn main() {
                 let to = input_u8("Make this number ");
                 let mut instance = Information::new(&number, false, false, from, to);
                 #[allow(unused_assignments)]
-                let mut output = Vec::<String>::new();
+                let mut output = String::new();
                 instance.pretreatment();
                 instance.number_check();
                 if instance.float {
                     instance.float_convert_to_decimal();
-                    output = instance.float_calculate();
+                    output = convert_vec_to_string(instance.float_calculate());
+                    let mut confirm = Information::new(
+                        output.as_str(),
+                        instance.minus,
+                        true,
+                        instance.to,
+                        instance.from,
+                    );
+                    confirm.float_convert_to_decimal();
+                    let compare = confirm.float_calculate();
+                    if instance.number != convert_vec_to_string(compare) {
+                        println!("This result is likely to contain error.");
+                    }
                 } else {
                     instance.integer_convert_to_decimal();
-                    output = instance.integer_calculate();
+                    output = convert_vec_to_string(instance.integer_calculate());
                 }
-                println!("Result -> {}", convert_vec_to_string(output));
+                println!("Result -> {}", output);
             }
         }
     } else {
