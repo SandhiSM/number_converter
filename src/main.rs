@@ -190,7 +190,7 @@ fn main() {
                     instance.integer_convert_to_decimal();
                     output = instance.integer_calculate();
                 }
-                println!("{}", convert_vec_to_string(output));
+                println!("Result -> {}", convert_vec_to_string(output));
             }
         }
     } else {
