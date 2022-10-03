@@ -348,7 +348,7 @@ fn decode(errorcode: &str) -> String {
 }
 fn help(function_name: &str) -> String {
     match function_name {
-        "--error-code" => return String::from(
+        "error-code" => return String::from(
                         r"
             [USAGE]
             main.exe --error-code <error code>
